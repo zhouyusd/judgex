@@ -29,8 +29,15 @@ var (
 	ErrSaveFileFailed    = errors.New("save file failed")
 )
 
+type ReadAtSeekCloser interface {
+	io.Reader
+	io.Seeker
+	io.Closer
+	io.ReaderAt
+}
+
 type Storage interface {
-	GetObject(ctx context.Context, objectName string) (io.ReadSeekCloser, error)
+	GetObject(ctx context.Context, objectName string) (ReadAtSeekCloser, error)
 	PutObject(ctx context.Context, src io.ReadSeekCloser, objectSize int64) error
 	RemoveObject(ctx context.Context, objectName string) error
 }
@@ -40,7 +47,7 @@ type MinioStorage struct {
 	bucketName string
 }
 
-func (ms *MinioStorage) GetObject(ctx context.Context, objectName string) (io.ReadSeekCloser, error) {
+func (ms *MinioStorage) GetObject(ctx context.Context, objectName string) (ReadAtSeekCloser, error) {
 	if len(objectName) < 6 {
 		return nil, ErrInvalidObjectName
 	}
@@ -89,7 +96,7 @@ type LocalStorage struct {
 	baseDir string
 }
 
-func (ls *LocalStorage) GetObject(_ context.Context, objectName string) (io.ReadSeekCloser, error) {
+func (ls *LocalStorage) GetObject(_ context.Context, objectName string) (ReadAtSeekCloser, error) {
 	if len(objectName) < 6 {
 		return nil, ErrInvalidObjectName
 	}

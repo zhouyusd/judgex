@@ -29,15 +29,16 @@ var (
 	ErrSaveFileFailed    = errors.New("save file failed")
 )
 
-type ReadAtSeekCloser interface {
+type SizeReadAtSeekCloser interface {
 	io.Reader
 	io.Seeker
 	io.Closer
 	io.ReaderAt
+	Size() int64
 }
 
 type Storage interface {
-	GetObject(ctx context.Context, objectName string) (ReadAtSeekCloser, error)
+	GetObject(ctx context.Context, objectName string) (SizeReadAtSeekCloser, error)
 	PutObject(ctx context.Context, src io.ReadSeekCloser, objectSize int64) error
 	RemoveObject(ctx context.Context, objectName string) error
 }
@@ -47,14 +48,30 @@ type MinioStorage struct {
 	bucketName string
 }
 
-func (ms *MinioStorage) GetObject(ctx context.Context, objectName string) (ReadAtSeekCloser, error) {
+type MinioObjectWrapper struct {
+	*minio.Object
+}
+
+func (mbw *MinioObjectWrapper) Size() int64 {
+	info, err := mbw.Stat()
+	if err != nil {
+		return 0
+	}
+	return info.Size
+}
+
+func (ms *MinioStorage) GetObject(ctx context.Context, objectName string) (SizeReadAtSeekCloser, error) {
 	if len(objectName) < 6 {
 		return nil, ErrInvalidObjectName
 	}
 	if filepath.Ext(objectName) != ".zip" {
 		objectName += ".zip"
 	}
-	return ms.client.GetObject(ctx, ms.bucketName, objectName, minio.GetObjectOptions{})
+	obj, err := ms.client.GetObject(ctx, ms.bucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return &MinioObjectWrapper{obj}, nil
 }
 
 func (ms *MinioStorage) PutObject(ctx context.Context, src io.ReadSeekCloser, objectSize int64) error {
@@ -96,7 +113,19 @@ type LocalStorage struct {
 	baseDir string
 }
 
-func (ls *LocalStorage) GetObject(_ context.Context, objectName string) (ReadAtSeekCloser, error) {
+type LocalFileWrapper struct {
+	*os.File
+}
+
+func (lfw *LocalFileWrapper) Size() int64 {
+	info, err := lfw.Stat()
+	if err != nil || info == nil {
+		return 0
+	}
+	return info.Size()
+}
+
+func (ls *LocalStorage) GetObject(_ context.Context, objectName string) (SizeReadAtSeekCloser, error) {
 	if len(objectName) < 6 {
 		return nil, ErrInvalidObjectName
 	}
@@ -107,7 +136,11 @@ func (ls *LocalStorage) GetObject(_ context.Context, objectName string) (ReadAtS
 	if !fileutil.IsExist(dst) {
 		return nil, ErrObjectNotFound
 	}
-	return os.Open(dst)
+	f, err := os.Open(dst)
+	if err != nil {
+		return nil, err
+	}
+	return &LocalFileWrapper{f}, nil
 }
 
 func (ls *LocalStorage) PutObject(_ context.Context, src io.ReadSeekCloser, _ int64) error {

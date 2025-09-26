@@ -1,6 +1,10 @@
 package problem
 
-import "fmt"
+import (
+	"fmt"
+
+	"entgo.io/ent/dialect/entsql"
+)
 
 // Type defines the type for the "type" enum field.
 type Type string
@@ -20,6 +24,10 @@ func (Type) Values() []string {
 		string(TypeSingleChoice),
 		string(TypeProgramming),
 	}
+}
+
+func (_type Type) Check() *entsql.Annotation {
+	return entsql.Check(fmt.Sprintf("`type`='%v'", _type))
 }
 
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.

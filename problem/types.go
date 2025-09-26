@@ -1,0 +1,26 @@
+package problem
+
+import "fmt"
+
+// Type defines the type for the "type" enum field.
+type Type string
+
+// Type values.
+const (
+	TypeSingleChoice Type = "SINGLE_CHOICE"
+	TypeProgramming  Type = "PROGRAMMING"
+)
+
+func (_type Type) String() string {
+	return string(_type)
+}
+
+// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
+func TypeValidator(_type Type) error {
+	switch _type {
+	case TypeSingleChoice, TypeProgramming:
+		return nil
+	default:
+		return fmt.Errorf("problem: invalid enum value for type field: %q", _type)
+	}
+}

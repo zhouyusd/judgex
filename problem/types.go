@@ -48,6 +48,26 @@ func TypeValidator(_type Type) error {
 	}
 }
 
+// MultipleChoiceScoringMethodType defines the multiple_choice_scoring_method for the "multiple_choice_scoring_method" enum field.
+type MultipleChoiceScoringMethodType string
+
+// MultipleChoiceScoringMethodType values.
+const (
+	AllOrNothing  MultipleChoiceScoringMethodType = "ALL_OR_NOTHING"
+	HalfForMissed MultipleChoiceScoringMethodType = "HALF_FOR_MISSED"
+)
+
+func (_type MultipleChoiceScoringMethodType) String() string {
+	return string(_type)
+}
+
+func (MultipleChoiceScoringMethodType) Values() []string {
+	return []string{
+		string(AllOrNothing),
+		string(HalfForMissed),
+	}
+}
+
 type TypeOrderItem struct {
 	Name string `json:"name"`
 	Type Type   `json:"type"`

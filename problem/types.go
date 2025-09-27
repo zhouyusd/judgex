@@ -71,7 +71,7 @@ func (MultipleChoiceScoringMethodType) Values() []string {
 // JudgementType defines the judgement_type for the "judgement_type" enum field.
 type JudgementType string
 
-// ObjectiveProblemJudgementType values.
+// JudgementType values.
 const (
 	BatchJudgeAfterEnd JudgementType = "BATCH_JUDGE_AFTER_END"
 	JudgeInTime        JudgementType = "JUDGE_IN_TIME"
@@ -85,6 +85,26 @@ func (JudgementType) Values() []string {
 	return []string{
 		string(BatchJudgeAfterEnd),
 		string(JudgeInTime),
+	}
+}
+
+// RankingMethod defines the ranking_method for the "ranking_method" enum field.
+type RankingMethod string
+
+// RankingMethod values.
+const (
+	RankingByPenalty RankingMethod = "RANKING_BY_PENALTY" // Penalty first, then AC数, then 并列
+	RankingByScore   RankingMethod = "RANKING_BY_SCORE"   // Score first, then AC数, then 并列
+)
+
+func (_type RankingMethod) String() string {
+	return string(_type)
+}
+
+func (RankingMethod) Values() []string {
+	return []string{
+		string(RankingByPenalty),
+		string(RankingByScore),
 	}
 }
 

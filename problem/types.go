@@ -47,3 +47,10 @@ func TypeValidator(_type Type) error {
 		return fmt.Errorf("problem: invalid enum value for type field: %q", _type)
 	}
 }
+
+type TypeOrderItem struct {
+	Name string `json:"name"`
+	Type Type   `json:"type"`
+	Min  int    `json:"min"` // 最少题目数
+	Max  int    `json:"max"` // 最多题目数
+}

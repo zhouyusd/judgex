@@ -68,6 +68,26 @@ func (MultipleChoiceScoringMethodType) Values() []string {
 	}
 }
 
+// JudgementType defines the judgement_type for the "judgement_type" enum field.
+type JudgementType string
+
+// ObjectiveProblemJudgementType values.
+const (
+	BatchJudgeAfterEnd JudgementType = "BATCH_JUDGE_AFTER_END"
+	JudgeInTime        JudgementType = "JUDGE_IN_TIME"
+)
+
+func (_type JudgementType) String() string {
+	return string(_type)
+}
+
+func (JudgementType) Values() []string {
+	return []string{
+		string(BatchJudgeAfterEnd),
+		string(JudgeInTime),
+	}
+}
+
 type TypeOrderItem struct {
 	Name string `json:"name"`
 	Type Type   `json:"type"`

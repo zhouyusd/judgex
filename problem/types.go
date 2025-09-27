@@ -11,8 +11,12 @@ type Type string
 
 // Type values.
 const (
-	TypeSingleChoice Type = "SINGLE_CHOICE"
-	TypeProgramming  Type = "PROGRAMMING"
+	TypeFillInBlank    Type = "FILL_IN_BLANK"
+	TypeMultipleChoice Type = "MULTIPLE_CHOICE"
+	TypeProgramming    Type = "PROGRAMMING"
+	TypeSingleChoice   Type = "SINGLE_CHOICE"
+	TypeSubjective     Type = "SUBJECTIVE"
+	TypeTrueOrFalse    Type = "TRUE_OR_FALSE"
 )
 
 func (_type Type) String() string {
@@ -21,8 +25,12 @@ func (_type Type) String() string {
 
 func (Type) Values() []string {
 	return []string{
-		string(TypeSingleChoice),
+		string(TypeFillInBlank),
+		string(TypeMultipleChoice),
 		string(TypeProgramming),
+		string(TypeSingleChoice),
+		string(TypeSubjective),
+		string(TypeTrueOrFalse),
 	}
 }
 
@@ -33,7 +41,7 @@ func (_type Type) Check() *entsql.Annotation {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeSingleChoice, TypeProgramming:
+	case TypeFillInBlank, TypeMultipleChoice, TypeProgramming, TypeSingleChoice, TypeSubjective, TypeTrueOrFalse:
 		return nil
 	default:
 		return fmt.Errorf("problem: invalid enum value for type field: %q", _type)
